@@ -17,12 +17,13 @@ def assignData(data, missing_data, clean_data):
         else:
             clean_data.append(d)
 
-def weightedKNN(data, p, k = 6):
+
+def KNN(data, p, k = 6):
     distance=[]
     for d in data:
         eucl_dist = 0
         for i in range(getNumFeatures(data)):
-            if p[i] != 1e99:
+            if i < len(p) and p[i] != 1e99:
                 eucl_dist += (d[i] - p[i])**2
             
         eucl_dist = math.sqrt(eucl_dist)
@@ -32,13 +33,14 @@ def weightedKNN(data, p, k = 6):
 
     #regular knn
     for i in range(getNumFeatures(data)):
-        if p[i] == 1e99:
+        if i < len(p) and p[i] == 1e99:
             p[i] = distance[0][1][i]
 
     print("new array ->", p)
+    return p
     #print(distance)
 
-f = open("C://Users//Gaming-Desktop//Desktop//MissingData1.txt", "r")
+f = open("C://Users//Gaming-Desktop//Desktop//MissingData2.txt", "r")
 fl = f.readlines()
 
 print("Loading data. . .")
@@ -57,7 +59,7 @@ for line in fl:
     data.append(col)
 f.close()
 
-printData(data)
+#printData(data)
 print("Data load complete. . .")
 print("Features ->", getNumFeatures(data))
 print("Samples ->", getNumSamples(data))
@@ -71,8 +73,14 @@ clean_data = []
 assignData(data, missing_data, clean_data)
 
 #run the algo
+result = open("C://Users//Gaming-Desktop//Desktop//Machine Learning Project//MarquetMissingData2.txt","w")
 for d in missing_data:
-    weightedKNN(clean_data, d, 6)
+   arr = KNN(clean_data, d, 6)
+   for val in arr:
+       result.write(str(val) + " ")
+   result.write("\n")
+result.close()
+   
 
 
 

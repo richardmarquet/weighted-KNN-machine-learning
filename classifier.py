@@ -1,6 +1,5 @@
-#only gets first/second col of each row, would be way to slow otherwise!
 import math
-numClasses = 5
+numClasses = 0
 numFeatures = 0
 numSamples = 0
 
@@ -58,7 +57,7 @@ def weightedKNN(testData, p, k = 6):
         d = group[0]
         eucl_dist = 0
         for i in range(numFeatures):
-            if p[i] != 1e99 and d[i] != 1e99:
+            if i < len(p) and i < len(d) and p[i] != 1e99 and d[i] != 1e99:
                 eucl_dist += (d[i] - p[i])**2
                 
         eucl_dist = math.sqrt(eucl_dist)
@@ -82,14 +81,16 @@ def weightedKNN(testData, p, k = 6):
             largestVal = freqList[i]
             index = i
     
-    print(freqList)
-    print("Val chosen ->", index+1)
+    #print(freqList)
+    #print("Val chosen ->", index+1)
     return index+1
     
-
-f = open("C://Users//Gaming-Desktop//Desktop//TrainData1.txt", "r")
-fLabel = open("C://Users//Gaming-Desktop//Desktop//TrainLabel1.txt", "r")
-fReal = open("C://Users//Gaming-Desktop//Desktop//TestData1.txt", "r")
+#TrainData
+f = open("C://Users//Gaming-Desktop//Desktop//TrainData3.txt", "r")
+#TrainLabel
+fLabel = open("C://Users//Gaming-Desktop//Desktop//TrainLabel3.txt", "r")
+#TestData
+fReal = open("C://Users//Gaming-Desktop//Desktop//TestData3.txt", "r")
 fl = f.readlines()
 f2 = fLabel.readlines()
 f3 = fReal.readlines()
@@ -98,9 +99,15 @@ print("Loading data. . .")
 
 #loads all labels into 'labels' array!
 labels = []
+maxNum = 0
 for l in f2:
+    if l == '\n':
+        continue
+    if int(l) > maxNum:
+        maxNum = int(l)
     labels.append(int(l))
 fLabel.close()
+numClasses = maxNum
 
 #loads all data into 'data' array!
 data = []
@@ -116,27 +123,23 @@ for line in fl:
     data.append(col)
 f.close()
 
-for i in range(len(data)):
-    if len(data[i]) != 3312:
-        data.pop(i)
-
 #lodas all test data in 'realData' array
 realData = []
 num = ""
 for line in f3:
     col = []
     for ch in line:
-        if ch.isspace() and num:
-            col.append(float(num))
+        if (ch == ',' or ch.isspace()) and num:
+            if float(num) == 1000000000:
+                print("yup")
+                col.append(float(1e99))
+            else:
+                col.append(float(num))
             num = ""
-        elif not ch.isspace():
+        elif not ch.isspace() or ch != ',':
             num += ch
     realData.append(col)
 fReal.close()
-
-for i in range(len(realData)):
-    if len(realData[i]) != 3312:
-        realData.pop(i)
 
 numFeatures = len(data[0])
 numSamples = len(data)
@@ -166,7 +169,17 @@ missing_data_mean_feature(testData)
 #print(total / 20)
 
 print("Starting KNN. . .")
+sampleNum = 0
+
+#Output File
+result = open("C://Users//Gaming-Desktop//Desktop//Machine Learning Project//MarquetClassification3.txt", "w")
 for i in range(len(realData)):
-    weightedKNN(testData, realData[i], 6)
+    val = weightedKNN(testData, realData[i], 6)
+    #print("Sample", sampleNum, "was predicted to be a value of ->", val)
+    sampleNum += 1
+    result.write(str(val) + "\n")
+result.close()
+
+    
 
 
